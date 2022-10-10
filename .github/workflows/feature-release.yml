@@ -2,7 +2,7 @@ name: feature release
 run-name: ${{ github.actor }} is releaseing feature
 on:
   push:
-    branch:
+    branches:
       - b*.*.*
 jobs:
   ci-feature-01:
