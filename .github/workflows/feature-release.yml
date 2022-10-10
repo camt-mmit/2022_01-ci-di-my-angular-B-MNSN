@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is releaseing feature
 on:
   push:
     branch:
-      - v*.*.*
+      - b*.*.*
 jobs:
   ci-feature-01:
     runs-on: ubuntu-latest
@@ -16,6 +16,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
+      - name: Setupe enviroment variables
+        run: |
+          VERSION="${REF_NAME#refs/heads/b}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "BRANCH_NAME=b${VERSION}" >> $GITHUB_ENV
+          echo "TAG_NAME=v${VERSION}" >> $GITHUB_ENV
       - name: Setup git user
         run: |
           git config --global user.email "${{ github.event.pusher.email }}"
@@ -32,8 +38,9 @@ jobs:
         run: yarn run test:ci
       - name: Merge to master
         run: |
+          git feech --unshallow
           git checkout master
           git merge ${{ env.BRANCH_NAME }}
           git push origin master
-          git tag -a ${{ env.BRANCH_NAME }} -m "my version ${{ env.BRANCH_NAME }}"
+          git tag -a ${{ env.TAG_NAME }} -m "my version ${{ env.VERSION }}"
           git push origin master --tags
